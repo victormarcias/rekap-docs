@@ -22,16 +22,11 @@ Sirve `public/` en `http://localhost:8002` (ahí queda en la raíz, no bajo `/re
 ## Deploy (Cloud Function, sin Docker)
 
 ```bash
-gcloud functions deploy serve_rekap \
-  --gen2 \
-  --runtime=python312 \
-  --region=us-east4 \
-  --entry-point=serve_rekap \
-  --trigger-http \
-  --allow-unauthenticated \
-  --source=.
+./deploy-prod.sh
 ```
+
+Vía `gcloud functions deploy`, región `us-east4` — sin Dockerfile, Cloud Build arma el runtime solo a partir de `main.py`/`requirements.txt`.
 
 En el proyecto de Firebase Hosting del portfolio, `/rekap` y `/rekap/**` se rutean con un rewrite tipo `function` a `serve_rekap` (ver `firebase.json` en el repo `portfolio`) — mismo mecanismo que ya usa `/cv` ahí (`serve_cv`), solo que este código vive en este repo aparte.
 
-Sin base de datos, sin variables de entorno, sin estado — la función solo lee un archivo de `public/` y lo devuelve con el `Content-Type` correcto.
+Sin base de datos, sin estado — la función solo lee un archivo de `public/` y lo devuelve con el `Content-Type` correcto.
