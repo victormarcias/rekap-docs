@@ -183,8 +183,7 @@ async function renderPage(path) {
   contentInnerEl.innerHTML = '<div class="rekap-status">Loading&hellip;</div>';
   try {
     const container = await loadPage(path);
-    contentInnerEl.innerHTML = '';
-    contentInnerEl.appendChild(container);
+    contentInnerEl.innerHTML = container.innerHTML;
     contentInnerEl.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
     contentEl.scrollTop = 0;
     document.title = `${titleFromName(path.split('/').pop())} — Rekap`;
