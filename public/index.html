@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rekap — Victor Hugo Marcias</title>
+  <meta name="description" content="Personal engineering knowledge base, read live from the Rekap repo.">
+  <meta name="color-scheme" content="dark">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%9A</text></svg>">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="rekap.css">
+</head>
+
+<body class="rekap-body">
+  <header class="rekap-header">
+    <a href="/" class="rekap-home-link">&larr; victormarcias.online</a>
+    <h1 class="rekap-title">📚 Rekap</h1>
+    <button id="rekap-sidebar-toggle" class="rekap-sidebar-toggle" type="button" aria-label="Toggle contents" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+  </header>
+
+  <div class="rekap-layout">
+    <nav id="rekap-sidebar" class="rekap-sidebar" aria-label="Rekap contents">
+      <div class="rekap-status">Loading contents&hellip;</div>
+    </nav>
+    <div id="rekap-sidebar-backdrop" class="rekap-sidebar-backdrop"></div>
+    <main id="rekap-content" class="rekap-content">
+      <div id="rekap-content-inner" class="markdown-body">
+        <div class="rekap-status">Loading&hellip;</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="rekap.js"></script>
+</body>
+
+</html>

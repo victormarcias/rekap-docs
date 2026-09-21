@@ -1,0 +1,250 @@
+:root {
+  --bg-canvas: #0d1117;
+  --bg-inset: #161b22;
+  --bg-hover: #1c2128;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-soft: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1f6feb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  color: var(--text);
+}
+
+.rekap-body {
+  background: var(--bg-canvas);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.rekap-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--bg-inset);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.rekap-home-link {
+  color: var(--text-soft);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.rekap-home-link:hover {
+  color: var(--accent);
+}
+
+.rekap-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+  flex: 1;
+}
+
+.rekap-sidebar-toggle {
+  display: none;
+  border: none;
+  background: none;
+  color: var(--text);
+  padding: 6px;
+  cursor: pointer;
+}
+
+.rekap-sidebar-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.rekap-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.rekap-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 20px 12px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-inset);
+}
+
+.rekap-sidebar-backdrop {
+  display: none;
+}
+
+.rekap-content {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-canvas);
+}
+
+.rekap-status {
+  color: var(--text-soft);
+  font-size: 14px;
+  padding: 8px 4px;
+}
+
+.rekap-error {
+  color: #f85149;
+}
+
+/* Sidebar tree */
+.rekap-tree ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 14px;
+}
+
+.rekap-tree > ul {
+  padding-left: 0;
+}
+
+.rekap-tree details {
+  margin-bottom: 1px;
+}
+
+.rekap-tree summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  list-style: none;
+  color: var(--text);
+}
+
+.rekap-tree summary::-webkit-details-marker,
+.rekap-tree summary::marker {
+  display: none;
+  content: '';
+}
+
+.rekap-tree summary::before {
+  content: '📁';
+  margin-right: 6px;
+}
+
+.rekap-tree details[open] > summary::before {
+  content: '📂';
+}
+
+.rekap-tree summary:hover {
+  background: var(--bg-hover);
+}
+
+.rekap-tree a {
+  display: block;
+  padding: 5px 8px;
+  border-radius: 6px;
+  color: var(--text-soft);
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.rekap-tree a::before {
+  content: '📄';
+  margin-right: 6px;
+}
+
+.rekap-tree a.rekap-index-link::before {
+  content: '📘';
+}
+
+.rekap-tree a:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.rekap-tree a.active {
+  background: rgba(56, 139, 253, 0.15);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--accent-bg);
+}
+
+/* github-markdown-css ships its own dark palette (#0d1117/#c9d1d9) that
+   already matches ours — only the container width/background need setting.
+   Padding lives here (not on the scrolling .rekap-content) so the scrollbar
+   sits flush against the viewport edge instead of leaving a gap. */
+.markdown-body {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+  background: transparent;
+}
+
+.markdown-body a {
+  color: #79c0ff;
+}
+
+.markdown-body a:hover {
+  color: #d1e9ff;
+}
+
+@media (max-width: 820px) {
+  .rekap-sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rekap-sidebar {
+    position: fixed;
+    top: 57px;
+    bottom: 0;
+    left: 0;
+    width: 82vw;
+    max-width: 320px;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    z-index: 20;
+    box-shadow: 12px 0 24px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .rekap-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .rekap-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 57px 0 0 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+  }
+
+  .rekap-sidebar.is-open ~ .rekap-sidebar-backdrop {
+    display: block;
+  }
+
+  .markdown-body {
+    padding: 28px 20px 60px;
+  }
+}
