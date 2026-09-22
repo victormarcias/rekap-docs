@@ -18,6 +18,10 @@ const sidebarBackdrop = document.getElementById('rekap-sidebar-backdrop');
 let allFiles = [];
 let currentPath = null;
 
+if (window.markedGfmHeadingId) {
+  marked.use(markedGfmHeadingId.gfmHeadingId());
+}
+
 const ACRONYMS = new Set([
   'ai', 'api', 'aws', 'bdd', 'ci', 'cd', 'cdn', 'cli', 'cors', 'cap', 'crud',
   'css', 'csr', 'csrf', 'db', 'dns', 'dry', 'fp', 'gc', 'gcp', 'gui', 'html',
@@ -58,7 +62,12 @@ function rewritePaths(container, currentPath) {
     const href = a.getAttribute('href');
     if (/^([a-z]+:)?\/\//i.test(href) || href.startsWith('mailto:')) return;
     const [filePart, anchor] = href.split('#');
-    if (!filePart) return;
+    if (!filePart) {
+      // Same-page anchor (e.g. a glossary's A-Z jump list) — route it through
+      // the current page's own path so it doesn't get treated as a file path.
+      if (anchor) a.setAttribute('href', '#' + currentPath + '#' + anchor);
+      return;
+    }
     const resolved = resolvePath(currentDir, filePart);
     a.setAttribute('href', '#' + resolved + (anchor ? '#' + anchor : ''));
   });
@@ -201,6 +210,7 @@ async function loadPage(path) {
   const res = await fetch(BASE + path);
   if (!res.ok) throw new Error(`404: ${path}`);
   const markdown = await res.text();
+  if (window.markedGfmHeadingId) markedGfmHeadingId.resetHeadings();
   const html = marked.parse(markdown);
   const container = document.createElement('div');
   container.innerHTML = html;
@@ -224,9 +234,16 @@ async function renderPage(path) {
   closeSidebarOnMobile();
 }
 
-function currentPathFromHash() {
+function currentPathAndAnchorFromHash() {
   const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-  return hash || DEFAULT_PATH;
+  const [path, anchor] = hash.split('#');
+  return { path: path || DEFAULT_PATH, anchor: anchor || null };
+}
+
+function scrollToAnchor(anchor) {
+  if (!anchor) return;
+  const target = contentInnerEl.querySelector(`#${CSS.escape(anchor)}, a[name="${CSS.escape(anchor)}"]`);
+  if (target) target.scrollIntoView({ block: 'start' });
 }
 
 function closeSidebarOnMobile() {
@@ -241,7 +258,14 @@ sidebarToggle.addEventListener('click', () => {
 sidebarBackdrop.addEventListener('click', closeSidebarOnMobile);
 searchInput.addEventListener('input', applySearch);
 
-window.addEventListener('hashchange', () => renderPage(currentPathFromHash()));
+window.addEventListener('hashchange', () => {
+  const { path, anchor } = currentPathAndAnchorFromHash();
+  if (path === currentPath) {
+    scrollToAnchor(anchor);
+  } else {
+    renderPage(path).then(() => scrollToAnchor(anchor));
+  }
+});
 
 (async function init() {
   try {
@@ -250,5 +274,7 @@ window.addEventListener('hashchange', () => renderPage(currentPathFromHash()));
   } catch (err) {
     treeContainerEl.innerHTML = `<div class="rekap-status rekap-error">Couldn't load the file list. ${err.message}</div>`;
   }
-  renderPage(currentPathFromHash());
+  const { path, anchor } = currentPathAndAnchorFromHash();
+  await renderPage(path);
+  scrollToAnchor(anchor);
 })();
