@@ -8,10 +8,15 @@ const CACHE_TTL_MS = 60 * 60 * 1000;
 const DEFAULT_PATH = 'README.md';
 
 const sidebarEl = document.getElementById('rekap-sidebar');
+const treeContainerEl = document.getElementById('rekap-tree-container');
+const searchInput = document.getElementById('rekap-search');
 const contentEl = document.getElementById('rekap-content');
 const contentInnerEl = document.getElementById('rekap-content-inner');
 const sidebarToggle = document.getElementById('rekap-sidebar-toggle');
 const sidebarBackdrop = document.getElementById('rekap-sidebar-backdrop');
+
+let allFiles = [];
+let currentPath = null;
 
 const ACRONYMS = new Set([
   'ai', 'api', 'aws', 'bdd', 'ci', 'cd', 'cdn', 'cli', 'cors', 'cap', 'crud',
@@ -136,8 +141,10 @@ function renderNode(node, dirPath) {
     const a = document.createElement('a');
     a.href = '#' + file.path;
     const isReadme = file.name.toLowerCase() === 'readme.md';
-    a.textContent = isReadme ? 'Index' : titleFromName(file.name);
+    const isGlosario = file.name.toLowerCase() === 'glosario.md';
+    a.textContent = isReadme ? 'Index' : isGlosario ? 'Glosario' : titleFromName(file.name);
     if (isReadme) a.classList.add('rekap-index-link');
+    if (isGlosario) a.classList.add('rekap-glosario-link');
     a.dataset.path = file.path;
     li.appendChild(a);
     ul.appendChild(li);
@@ -146,18 +153,40 @@ function renderNode(node, dirPath) {
   return ul;
 }
 
-function renderSidebar(paths) {
+function renderSidebar(paths, { expandAll = false } = {}) {
+  treeContainerEl.innerHTML = '';
+
+  if (paths.length === 0) {
+    treeContainerEl.innerHTML = '<div class="rekap-status">No matches.</div>';
+    return;
+  }
+
   const tree = buildTree(paths);
-  sidebarEl.innerHTML = '';
   const wrap = document.createElement('div');
   wrap.className = 'rekap-tree';
   wrap.appendChild(renderNode(tree, ''));
-  sidebarEl.appendChild(wrap);
+  treeContainerEl.appendChild(wrap);
+
+  if (expandAll) {
+    wrap.querySelectorAll('details').forEach(details => { details.open = true; });
+  }
+}
+
+function filterFiles(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return allFiles;
+  return allFiles.filter(path => path.toLowerCase().includes(q));
+}
+
+function applySearch() {
+  const query = searchInput.value;
+  renderSidebar(filterFiles(query), { expandAll: query.trim() !== '' });
+  if (currentPath) setActiveSidebarLink(currentPath);
 }
 
 function setActiveSidebarLink(path) {
-  sidebarEl.querySelectorAll('a.active').forEach(a => a.classList.remove('active'));
-  const link = sidebarEl.querySelector(`a[data-path="${CSS.escape(path)}"]`);
+  treeContainerEl.querySelectorAll('a.active').forEach(a => a.classList.remove('active'));
+  const link = treeContainerEl.querySelector(`a[data-path="${CSS.escape(path)}"]`);
   if (!link) return;
   link.classList.add('active');
   let details = link.closest('details');
@@ -180,6 +209,7 @@ async function loadPage(path) {
 }
 
 async function renderPage(path) {
+  currentPath = path;
   contentInnerEl.innerHTML = '<div class="rekap-status">Loading&hellip;</div>';
   try {
     const container = await loadPage(path);
@@ -209,15 +239,16 @@ sidebarToggle.addEventListener('click', () => {
   sidebarToggle.setAttribute('aria-expanded', String(isOpen));
 });
 sidebarBackdrop.addEventListener('click', closeSidebarOnMobile);
+searchInput.addEventListener('input', applySearch);
 
 window.addEventListener('hashchange', () => renderPage(currentPathFromHash()));
 
 (async function init() {
   try {
-    const files = await fetchTree();
-    renderSidebar(files);
+    allFiles = await fetchTree();
+    renderSidebar(allFiles);
   } catch (err) {
-    sidebarEl.innerHTML = `<div class="rekap-status rekap-error">Couldn't load the file list. ${err.message}</div>`;
+    treeContainerEl.innerHTML = `<div class="rekap-status rekap-error">Couldn't load the file list. ${err.message}</div>`;
   }
   renderPage(currentPathFromHash());
 })();
