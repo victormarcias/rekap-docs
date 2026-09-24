@@ -1,0 +1,116 @@
+/* Language popup menu — sits ~28px right of the title (16px header gap +
+   12px margin below) and is built to grow past two languages: each entry
+   is just another <li data-lang="…"> in the list. */
+.rekap-lang-menu {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.rekap-lang-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.rekap-lang-button:hover,
+.rekap-lang-button[aria-expanded="true"] {
+  border-color: var(--accent);
+}
+
+.rekap-lang-flag {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.rekap-lang-caret {
+  color: var(--text-soft);
+  transition: transform 0.2s ease;
+}
+
+.rekap-lang-button[aria-expanded="true"] .rekap-lang-caret {
+  transform: rotate(180deg);
+}
+
+.rekap-lang-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 150px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  z-index: 30;
+  transform-origin: top left;
+  animation: rekap-lang-pop 0.16s ease;
+}
+
+.rekap-lang-list[hidden] {
+  display: none;
+}
+
+@keyframes rekap-lang-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rekap-lang-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.rekap-lang-list li:hover {
+  background: var(--bg-hover);
+}
+
+.rekap-lang-list li[aria-selected="true"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.rekap-lang-list li[aria-selected="true"]::after {
+  content: '✓';
+  margin-left: auto;
+}
+
+/* Content fade when switching language via the menu above. */
+#rekap-content-inner {
+  transition: opacity 0.18s ease;
+  opacity: 1;
+}
+
+#rekap-content-inner.rekap-fade {
+  opacity: 0;
+}
+
+@media (max-width: 480px) {
+  .rekap-home-link-text {
+    display: none;
+  }
+}
