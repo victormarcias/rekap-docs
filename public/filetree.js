@@ -6,7 +6,7 @@
 
 const OWNER = 'victormarcias';
 const REPO = 'Rekap';
-const BRANCH = 'translate-english';
+const BRANCH = 'main';
 const BASE = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
 const TREE_API = `https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`;
 const CACHE_KEY = 'rekap_tree_cache_v1';
