@@ -1,5 +1,6 @@
 const contentEl = document.getElementById('rekap-content');
 const contentInnerEl = document.getElementById('rekap-content-inner');
+const scrollTopEl = document.getElementById('rekap-scroll-top');
 
 let currentPath = null;
 // `BASE`, `DEFAULT_PATH`, `titleFromName()`, `setActiveSidebarLink()`,
@@ -87,6 +88,31 @@ function scrollToAnchor(anchor) {
   const target = contentInnerEl.querySelector(`#${CSS.escape(anchor)}, a[name="${CSS.escape(anchor)}"]`);
   if (target) target.scrollIntoView({ block: 'start' });
 }
+
+const SCROLL_TOP_THRESHOLD = 400;
+const SCROLL_TOP_BUTTON_SIZE = 42;
+const SCROLL_TOP_GAP = 16;
+
+// .markdown-body is a 3-column grid (gutter / 820px text column / gutter),
+// centered and re-centering with viewport width — so "just right of the
+// text" has to be computed from its actual box, not a fixed CSS offset.
+function positionScrollTop() {
+  const rect = contentInnerEl.getBoundingClientRect();
+  const colWidth = Math.min(820, rect.width);
+  const columnRight = rect.left + rect.width / 2 + colWidth / 2;
+  const maxLeft = window.innerWidth - SCROLL_TOP_BUTTON_SIZE - 8;
+  scrollTopEl.style.left = `${Math.min(columnRight + SCROLL_TOP_GAP, maxLeft)}px`;
+}
+
+contentEl.addEventListener('scroll', () => {
+  scrollTopEl.classList.toggle('is-visible', contentEl.scrollTop > SCROLL_TOP_THRESHOLD);
+});
+window.addEventListener('resize', positionScrollTop);
+positionScrollTop();
+
+scrollTopEl.addEventListener('click', () => {
+  contentEl.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 window.addEventListener('hashchange', () => {
   const { path, anchor } = currentPathAndAnchorFromHash();

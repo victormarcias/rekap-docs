@@ -180,6 +180,49 @@ body {
   background: var(--bg-canvas);
 }
 
+/* Floating "back to top" button — hidden/dropped-down by default, rekap.js
+   toggles .is-visible once the content area has scrolled past a threshold.
+   `left` is set from JS (positionScrollTop()) so it sits just right of the
+   820px text column instead of the viewport edge — it shifts with the
+   column's own centering, so it can't be pinned with plain CSS. */
+.rekap-scroll-top {
+  position: fixed;
+  bottom: 24px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-inset);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.15s ease, color 0.15s ease;
+  z-index: 20;
+}
+
+.rekap-scroll-top.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.rekap-scroll-top:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Don't float above the mobile sidebar's dim backdrop while it's open. */
+.rekap-sidebar.is-open ~ .rekap-content .rekap-scroll-top {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .rekap-status {
   color: var(--text-soft);
   font-size: 14px;
