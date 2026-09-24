@@ -1,6 +1,6 @@
 const OWNER = 'victormarcias';
 const REPO = 'Rekap';
-const BRANCH = 'main';
+const BRANCH = 'translate-english';
 const BASE = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
 const TREE_API = `https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`;
 const CACHE_KEY = 'rekap_tree_cache_v1';
@@ -17,6 +17,8 @@ const sidebarBackdrop = document.getElementById('rekap-sidebar-backdrop');
 
 let allFiles = [];
 let currentPath = null;
+// `topics`, `currentLang`, `baseKey()`, `resolveLangPath()` live in language.js
+// (loaded before this file) — init() below fills `topics` in once the tree loads.
 
 if (window.markedGfmHeadingId) {
   marked.use(markedGfmHeadingId.gfmHeadingId());
@@ -35,10 +37,10 @@ function titleFromName(name) {
   const base = name.replace(/\.md$/i, '').replace(/[-_]/g, ' ');
   return base
     .split(' ')
-    .map((word, i) => {
+    .map((word) => {
       if (!word) return word;
       if (ACRONYMS.has(word.toLowerCase())) return word.toUpperCase();
-      return i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word;
+      return word.charAt(0).toUpperCase() + word.slice(1);
     })
     .join(' ');
 }
@@ -68,7 +70,7 @@ function rewritePaths(container, currentPath) {
       if (anchor) a.setAttribute('href', '#' + currentPath + '#' + anchor);
       return;
     }
-    const resolved = resolvePath(currentDir, filePart);
+    const resolved = baseKey(resolvePath(currentDir, filePart));
     a.setAttribute('href', '#' + resolved + (anchor ? '#' + anchor : ''));
   });
 
@@ -150,10 +152,10 @@ function renderNode(node, dirPath) {
     const a = document.createElement('a');
     a.href = '#' + file.path;
     const isReadme = file.name.toLowerCase() === 'readme.md';
-    const isGlosario = file.name.toLowerCase() === 'glosario.md';
-    a.textContent = isReadme ? 'Index' : isGlosario ? 'Glosario' : titleFromName(file.name);
+    const isGlossary = file.name.toLowerCase() === 'glossary.md';
+    a.textContent = isReadme ? 'Index' : isGlossary ? 'Glossary' : titleFromName(file.name);
     if (isReadme) a.classList.add('rekap-index-link');
-    if (isGlosario) a.classList.add('rekap-glosario-link');
+    if (isGlossary) a.classList.add('rekap-glosario-link');
     a.dataset.path = file.path;
     li.appendChild(a);
     ul.appendChild(li);
@@ -183,8 +185,9 @@ function renderSidebar(paths, { expandAll = false } = {}) {
 
 function filterFiles(query) {
   const q = query.trim().toLowerCase();
-  if (!q) return allFiles;
-  return allFiles.filter(path => path.toLowerCase().includes(q));
+  const keys = Array.from(topics.keys());
+  if (!q) return keys;
+  return keys.filter(path => path.toLowerCase().includes(q));
 }
 
 function applySearch() {
@@ -207,8 +210,9 @@ function setActiveSidebarLink(path) {
 }
 
 async function loadPage(path) {
-  const res = await fetch(BASE + path);
-  if (!res.ok) throw new Error(`404: ${path}`);
+  const fetchPath = resolveLangPath(path);
+  const res = await fetch(BASE + fetchPath);
+  if (!res.ok) throw new Error(`404: ${fetchPath}`);
   const markdown = await res.text();
   if (window.markedGfmHeadingId) markedGfmHeadingId.resetHeadings();
   const html = marked.parse(markdown);
@@ -270,7 +274,8 @@ window.addEventListener('hashchange', () => {
 (async function init() {
   try {
     allFiles = await fetchTree();
-    renderSidebar(allFiles);
+    topics = buildTopics(allFiles);
+    renderSidebar(Array.from(topics.keys()));
   } catch (err) {
     treeContainerEl.innerHTML = `<div class="rekap-status rekap-error">Couldn't load the file list. ${err.message}</div>`;
   }

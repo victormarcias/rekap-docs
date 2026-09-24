@@ -13,12 +13,27 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-dark.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <link rel="stylesheet" href="rekap.css">
+  <link rel="stylesheet" href="language.css">
 </head>
 
 <body class="rekap-body">
   <header class="rekap-header">
-    <a href="/" class="rekap-home-link">&larr; victormarcias.online</a>
+    <a href="/" class="rekap-home-link">&larr; <span class="rekap-home-link-text">victormarcias.online</span></a>
     <h1 class="rekap-title">📚 Rekap</h1>
+    <div id="rekap-lang-menu" class="rekap-lang-menu">
+      <button type="button" id="rekap-lang-button" class="rekap-lang-button" aria-haspopup="listbox" aria-expanded="false">
+        <span class="rekap-lang-flag" aria-hidden="true">🇬🇧</span>
+        <span class="rekap-lang-code">EN</span>
+        <svg class="rekap-lang-caret" viewBox="0 0 12 8" width="10" height="7" aria-hidden="true">
+          <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <ul id="rekap-lang-list" class="rekap-lang-list" role="listbox" aria-label="Language" hidden>
+        <li role="option" data-lang="es" aria-selected="false"><span class="rekap-lang-flag" aria-hidden="true">🇪🇸</span> Español</li>
+        <li role="option" data-lang="en" aria-selected="true"><span class="rekap-lang-flag" aria-hidden="true">🇬🇧</span> English</li>
+      </ul>
+    </div>
+    <span class="rekap-header-spacer"></span>
     <button id="rekap-sidebar-toggle" class="rekap-sidebar-toggle" type="button" aria-label="Toggle contents" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -46,6 +61,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked-gfm-heading-id/3.2.0/index.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="language.js"></script>
   <script src="rekap.js"></script>
 </body>
 
