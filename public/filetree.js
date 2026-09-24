@@ -16,6 +16,7 @@ const DEFAULT_PATH = 'README.md';
 const sidebarEl = document.getElementById('rekap-sidebar');
 const treeContainerEl = document.getElementById('rekap-tree-container');
 const searchInput = document.getElementById('rekap-search');
+const searchClearEl = document.getElementById('rekap-search-clear');
 const sidebarToggle = document.getElementById('rekap-sidebar-toggle');
 const sidebarBackdrop = document.getElementById('rekap-sidebar-backdrop');
 
@@ -237,6 +238,7 @@ function filterFiles(query) {
 
 function applySearch() {
   const query = searchInput.value;
+  searchClearEl.hidden = query === '';
   renderSidebar(filterFiles(query), { expandAll: query.trim() !== '' });
   if (currentPath) setActiveSidebarLink(currentPath);
 }
@@ -265,6 +267,11 @@ sidebarToggle.addEventListener('click', () => {
 });
 sidebarBackdrop.addEventListener('click', closeSidebarOnMobile);
 searchInput.addEventListener('input', applySearch);
+searchClearEl.addEventListener('click', () => {
+  searchInput.value = '';
+  searchInput.focus();
+  applySearch();
+});
 
 treeContainerEl.addEventListener('click', (e) => {
   const summary = e.target.closest('summary');

@@ -45,7 +45,15 @@
 
   <div class="rekap-layout">
     <nav id="rekap-sidebar" class="rekap-sidebar" aria-label="Rekap contents">
-      <input id="rekap-search" class="rekap-search" type="search" placeholder="Search files…" autocomplete="off" spellcheck="false">
+      <div class="rekap-search-wrap">
+        <input id="rekap-search" class="rekap-search" type="search" placeholder="Search files…" autocomplete="off" spellcheck="false">
+        <button type="button" id="rekap-search-clear" class="rekap-search-clear" aria-label="Clear search" hidden>
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <line x1="3" y1="3" x2="13" y2="13"></line>
+            <line x1="13" y1="3" x2="3" y2="13"></line>
+          </svg>
+        </button>
+      </div>
       <div id="rekap-tree-container">
         <div class="rekap-status">Loading contents&hellip;</div>
       </div>

@@ -100,17 +100,33 @@ body {
   background: var(--bg-inset);
 }
 
-.rekap-search {
+.rekap-search-wrap {
+  position: relative;
   flex-shrink: 0;
-  width: 100%;
   margin-bottom: 12px;
-  padding: 7px 10px;
+}
+
+.rekap-search {
+  width: 100%;
+  padding: 7px 30px 7px 10px;
   font-size: 13px;
   font-family: inherit;
   color: var(--text);
   background: var(--bg-canvas);
   border: 1px solid var(--border);
   border-radius: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Native search-input cancel button's hit area isn't reliably resizable
+   across browsers — hide it and use our own button (.rekap-search-clear)
+   below, which gets a bigger click target without a bigger icon. */
+.rekap-search::-webkit-search-cancel-button,
+.rekap-search::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
 }
 
 .rekap-search::placeholder {
@@ -120,6 +136,30 @@ body {
 .rekap-search:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+.rekap-search-clear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--text-soft);
+  cursor: pointer;
+  padding: 0;
+}
+
+.rekap-search-clear:hover {
+  color: var(--text);
+}
+
+.rekap-search-clear[hidden] {
+  display: none;
 }
 
 #rekap-tree-container {
