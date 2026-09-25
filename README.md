@@ -1,6 +1,6 @@
 # rekap-docs
 
-Visor web en vivo del repo [Rekap](https://github.com/victormarcias/Rekap) — se sirve bajo `victormarcias.online/rekap`, repo aparte del [portfolio](https://github.com/victormarcias/portfolio), sin relación de código con él (mismo espíritu que `fastapi-blog` bajo `/hero-blog`: repo y deploy propios, el portfolio solo lo rutea).
+Visor web en vivo del repo [Rekap](https://github.com/victormarcias/Rekap) — se sirve bajo `victormarcias.online/rekap-docs`, repo aparte del [portfolio](https://github.com/victormarcias/portfolio), sin relación de código con él (mismo espíritu que `fastapi-blog` bajo `/hero-blog`: repo y deploy propios, el portfolio solo lo rutea).
 
 No hay build ni export intermedio: el sidebar se arma en el cliente pidiendo el árbol del repo Rekap a la API de GitHub, y cada página se pide en vivo a `raw.githubusercontent.com` y se renderiza con `marked` + `highlight.js` (ambos por CDN, sin bundler).
 
@@ -9,7 +9,7 @@ No hay build ni export intermedio: el sidebar se arma en el cliente pidiendo el 
 - `public/index.html` — shell de la página
 - `public/rekap.js` — fetch del árbol (con cache de 1h en `localStorage`), armado del sidebar, routing por hash (`#carpeta/archivo.md`), carga y renderizado de cada página
 - `public/rekap.css` — estilos (variables de color propias, sin depender del `styles.css` del portfolio)
-- `main.py` — Cloud Function (`serve_rekap`, 2nd gen, Python) que sirve los archivos de `public/`, resolviendo el prefijo `/rekap` — no hace falta Docker: `gcloud`/Firebase arman el container solos a partir de esto.
+- `main.py` — Cloud Function (`serve_rekap`, 2nd gen, Python) que sirve los archivos de `public/`, resolviendo el prefijo `/rekap-docs` — no hace falta Docker: `gcloud`/Firebase arman el container solos a partir de esto.
 
 ## Correr local
 
@@ -17,7 +17,7 @@ No hay build ni export intermedio: el sidebar se arma en el cliente pidiendo el 
 ./run-local.sh
 ```
 
-Sirve `public/` en `http://localhost:8002` (ahí queda en la raíz, no bajo `/rekap` — el prefijo lo agrega la Cloud Function recién en producción).
+Sirve `public/` en `http://localhost:8002` (ahí queda en la raíz, no bajo `/rekap-docs` — el prefijo lo agrega la Cloud Function recién en producción).
 
 ## Deploy (Cloud Function, sin Docker)
 
@@ -27,6 +27,6 @@ Sirve `public/` en `http://localhost:8002` (ahí queda en la raíz, no bajo `/re
 
 Vía `gcloud functions deploy`, región `us-east4` — sin Dockerfile, Cloud Build arma el runtime solo a partir de `main.py`/`requirements.txt`.
 
-En el proyecto de Firebase Hosting del portfolio, `/rekap` y `/rekap/**` se rutean con un rewrite tipo `function` a `serve_rekap` (ver `firebase.json` en el repo `portfolio`) — mismo mecanismo que ya usa `/cv` ahí (`serve_cv`), solo que este código vive en este repo aparte.
+En el proyecto de Firebase Hosting del portfolio, `/rekap-docs` y `/rekap-docs/**` se rutean con un rewrite tipo `function` a `serve_rekap` (ver `firebase.json` en el repo `portfolio`) — mismo mecanismo que ya usa `/cv` ahí (`serve_cv`), solo que este código vive en este repo aparte.
 
 Sin base de datos, sin estado — la función solo lee un archivo de `public/` y lo devuelve con el `Content-Type` correcto.
