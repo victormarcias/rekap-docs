@@ -100,7 +100,13 @@ function positionScrollTop() {
   const rect = contentInnerEl.getBoundingClientRect();
   const colWidth = Math.min(820, rect.width);
   const columnRight = rect.left + rect.width / 2 + colWidth / 2;
-  const maxLeft = window.innerWidth - SCROLL_TOP_BUTTON_SIZE - 8;
+  // Clamp against contentEl's own scrollable box, not window.innerWidth —
+  // Windows reserves ~17px of opaque scrollbar that innerWidth still counts
+  // as page width, so a window.innerWidth-based clamp let the button land
+  // underneath it (invisible there; macOS's overlay scrollbar hid the bug).
+  const contentRect = contentEl.getBoundingClientRect();
+  const safeRight = contentRect.left + contentEl.clientWidth;
+  const maxLeft = safeRight - SCROLL_TOP_BUTTON_SIZE - 8;
   scrollTopEl.style.left = `${Math.min(columnRight + SCROLL_TOP_GAP, maxLeft)}px`;
 }
 
