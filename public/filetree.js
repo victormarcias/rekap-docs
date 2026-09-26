@@ -236,9 +236,20 @@ function toggleDetailsAnimated(details) {
 // there — it's just a visual "this is where I was" pointer in the tree.
 const BOOKMARK_KEY = 'rekap_bookmark_v1';
 
+// Index (README.md) and Glossary are permanent fixtures already one click
+// away at all times — bookmarking them would just point back at the sidebar
+// itself, so they're excluded from the pin entirely. baseKey() (language.js)
+// normalizes readme.es.md/glossary.es.md to the same .md name first, so the
+// Spanish variant is excluded too.
+function isBookmarkable(path) {
+  const name = baseKey(path).split('/').pop().toLowerCase();
+  return name !== 'readme.md' && name !== 'glossary.md';
+}
+
 function getBookmark() {
   try {
-    return localStorage.getItem(BOOKMARK_KEY);
+    const saved = localStorage.getItem(BOOKMARK_KEY);
+    return saved && isBookmarkable(saved) ? saved : null;
   } catch (err) {
     return null;
   }
@@ -277,7 +288,7 @@ function makePinButton(path) {
 function syncPinButtons() {
   treeContainerEl.querySelectorAll('.rekap-pin-btn').forEach(btn => btn.remove());
   const bookmark = getBookmark();
-  const paths = new Set([currentPath, bookmark].filter(Boolean));
+  const paths = new Set([currentPath, bookmark].filter(path => path && isBookmarkable(path)));
   paths.forEach(path => {
     const link = treeContainerEl.querySelector(`a[data-path="${CSS.escape(path)}"]`);
     if (link) link.after(makePinButton(path));
