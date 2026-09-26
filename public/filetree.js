@@ -131,6 +131,7 @@ function renderNode(node, dirPath) {
     });
   for (const file of files) {
     const li = document.createElement('li');
+    li.className = 'rekap-tree-file';
     const a = document.createElement('a');
     a.href = '#' + file.path;
     const isReadme = file.name.toLowerCase() === 'readme.md';
@@ -229,6 +230,60 @@ function toggleDetailsAnimated(details) {
   }
 }
 
+// Bookmark ("📌 like a bookmark in a book"): a single manually-placed marker
+// remembering one page, independent of which page is currently open/active.
+// Persisted in localStorage so it survives reloads, but never auto-navigates
+// there — it's just a visual "this is where I was" pointer in the tree.
+const BOOKMARK_KEY = 'rekap_bookmark_v1';
+
+function getBookmark() {
+  try {
+    return localStorage.getItem(BOOKMARK_KEY);
+  } catch (err) {
+    return null;
+  }
+}
+
+function setBookmark(path) {
+  try {
+    if (path) localStorage.setItem(BOOKMARK_KEY, path);
+    else localStorage.removeItem(BOOKMARK_KEY);
+  } catch (err) {
+    // Storage can be full or disabled (private browsing) — the bookmark just won't persist.
+  }
+}
+
+function makePinButton(path) {
+  const isBookmarked = getBookmark() === path;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'rekap-pin-btn';
+  if (isBookmarked) btn.classList.add('is-bookmarked');
+  btn.textContent = '📌';
+  btn.setAttribute('aria-label', isBookmarked ? 'Remove bookmark' : 'Bookmark this page');
+  btn.title = isBookmarked ? 'Remove bookmark' : 'Bookmark this page';
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setBookmark(isBookmarked ? null : path);
+    syncPinButtons();
+  });
+  return btn;
+}
+
+// Shows a 📌 next to the currently active page (click to bookmark it) and,
+// if different, next to whichever page is actually bookmarked — so the
+// bookmark stays visible in the tree even while reading something else.
+function syncPinButtons() {
+  treeContainerEl.querySelectorAll('.rekap-pin-btn').forEach(btn => btn.remove());
+  const bookmark = getBookmark();
+  const paths = new Set([currentPath, bookmark].filter(Boolean));
+  paths.forEach(path => {
+    const link = treeContainerEl.querySelector(`a[data-path="${CSS.escape(path)}"]`);
+    if (link) link.after(makePinButton(path));
+  });
+}
+
 function filterFiles(query) {
   const q = query.trim().toLowerCase();
   const keys = Array.from(topics.keys());
@@ -254,6 +309,7 @@ function setActiveSidebarLink(path) {
     details = details.parentElement ? details.parentElement.closest('details') : null;
   }
   link.scrollIntoView({ block: 'nearest' });
+  syncPinButtons();
 }
 
 function closeSidebarOnMobile() {
