@@ -40,7 +40,6 @@ const WORD_OVERRIDES = {
   fastapi: 'FastAPI',
   graphql: 'GraphQL',
   javascript: 'JavaScript',
-  n8n: 'n8n',
   nestjs: 'NestJS',
   nosql: 'NoSQL',
   oauth: 'OAuth',
